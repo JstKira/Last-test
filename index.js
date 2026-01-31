@@ -2,6 +2,8 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
+    
+    // إظهار واجهة التحميل وإخفاء النتائج القديمة
     document.getElementById('loading').style.display = 'block';
     document.getElementById('dashboard').style.display = 'none';
     
@@ -21,7 +23,6 @@ function processChatData(chatText) {
         netActivity: 0 
     };
 
-    // كلمات مفتاحية لاستبعاد رسائل النظام
     const systemKeywords = ["انضم", "غادر", "أضاف", "joined", "left", "added", "تغيرت", "أنشأ", "created", "security code", "رموز الأمان"];
 
     lines.forEach(line => {
@@ -30,7 +31,7 @@ function processChatData(chatText) {
 
         let sender = "", message = "";
         
-        // المحرك الذكي للفصل (أندرويد + آيفون)
+        // المحرك الذكي للفصل
         if (cleanLine.includes("] ") && cleanLine.includes(": ")) {
             const parts = cleanLine.split("] ");
             const content = parts.slice(1).join("] ").split(": ");
@@ -44,7 +45,6 @@ function processChatData(chatText) {
         }
 
         if (sender && message) {
-            // استبعاد رسائل النظام من تفاعل العضو
             if (systemKeywords.some(k => message.includes(k)) || sender.length > 30) {
                 stats.system++;
                 return;
@@ -76,30 +76,30 @@ function displayDetailedStats(members, stats) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
 
-    // تحديث الأرقام الكلية
+    // تحديث الأرقام الكلية في الكروت الجديدة
     document.getElementById('totalMsg').innerText = stats.totalRaw.toLocaleString();
     document.getElementById('textOnly').innerText = stats.textOnly.toLocaleString();
     document.getElementById('totalMedia').innerText = stats.media.toLocaleString();
     document.getElementById('totalDeleted').innerText = stats.deleted.toLocaleString();
     document.getElementById('systemMsg').innerText = stats.system.toLocaleString();
-    document.getElementById('memberCount').innerText = Object.keys(members).length;
+    document.getElementById('memberCount').innerText = Object.keys(members).length.toLocaleString();
     document.getElementById('netStats').innerText = stats.netActivity.toLocaleString();
 
     const tableBody = document.getElementById('membersBody');
     tableBody.innerHTML = '';
 
-    // الترتيب حسب "التفاعل الصافي" (أهم مقياس للقادة)
+    // الترتيب حسب التفاعل الصافي
     const sorted = Object.entries(members).sort((a, b) => (b[1].total - b[1].deleted) - (a[1].total - a[1].deleted));
 
     sorted.forEach(([name, data]) => {
         const userNet = data.total - data.deleted;
         const row = `
             <tr>
-                <td style="color:#58a6ff; font-weight:bold;">${name}</td>
+                <td style="color:#fff; font-weight:bold;">${name}</td>
                 <td>${data.text}</td>
                 <td>${data.media}</td>
-                <td style="color:#f85149;">${data.deleted}</td>
-                <td style="color:#3fb950; font-weight:bold; background: rgba(63, 185, 80, 0.1);">${userNet}</td>
+                <td style="color:#ff4444;">${data.deleted}</td>
+                <td><span class="net-score">${userNet}</span></td>
             </tr>`;
         tableBody.innerHTML += row;
     });
