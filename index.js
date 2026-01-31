@@ -3,7 +3,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     if (!file) return;
     const reader = new FileReader();
     
-    // إظهار واجهة التحميل وإخفاء النتائج القديمة
     document.getElementById('loading').style.display = 'block';
     document.getElementById('dashboard').style.display = 'none';
     
@@ -23,7 +22,8 @@ function processChatData(chatText) {
         netActivity: 0 
     };
 
-    const systemKeywords = ["انضم", "غادر", "أضاف", "joined", "left", "added", "تغيرت", "أنشأ", "created", "security code", "رموز الأمان"];
+    // كلمات مفتاحية لاستبعاد رسائل النظام البرمجية من تفاعل العضو
+    const systemKeywords = ["انضم", "غادر", "أضاف", "joined", "left", "added", "تغيرت", "أنشأ", "created", "security code", "رموز الأمان", "تغير وصف"];
 
     lines.forEach(line => {
         const cleanLine = line.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
@@ -31,7 +31,7 @@ function processChatData(chatText) {
 
         let sender = "", message = "";
         
-        // المحرك الذكي للفصل
+        // محرك الفصل الذكي (يدعم أندرويد وآيفون)
         if (cleanLine.includes("] ") && cleanLine.includes(": ")) {
             const parts = cleanLine.split("] ");
             const content = parts.slice(1).join("] ").split(": ");
@@ -45,12 +45,15 @@ function processChatData(chatText) {
         }
 
         if (sender && message) {
+            // استبعاد رسائل النظام: إذا كانت الرسالة إجرائية (مثل إضافة عضو) لا تُحسب
             if (systemKeywords.some(k => message.includes(k)) || sender.length > 30) {
                 stats.system++;
                 return;
             }
 
-            if (!members[sender]) members[sender] = { text: 0, media: 0, deleted: 0, total: 0 };
+            if (!members[sender]) {
+                members[sender] = { text: 0, media: 0, deleted: 0, total: 0 };
+            }
 
             stats.totalRaw++;
             members[sender].total++;
@@ -68,6 +71,7 @@ function processChatData(chatText) {
         }
     });
 
+    // التفاعل الصافي = كل الرسائل الفعلية - المحذوفة
     stats.netActivity = stats.totalRaw - stats.deleted;
     displayDetailedStats(members, stats);
 }
@@ -76,30 +80,30 @@ function displayDetailedStats(members, stats) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
 
-    // تحديث الأرقام الكلية في الكروت الجديدة
+    // تحديث الأرقام الكلية في الواجهة
     document.getElementById('totalMsg').innerText = stats.totalRaw.toLocaleString();
     document.getElementById('textOnly').innerText = stats.textOnly.toLocaleString();
     document.getElementById('totalMedia').innerText = stats.media.toLocaleString();
     document.getElementById('totalDeleted').innerText = stats.deleted.toLocaleString();
     document.getElementById('systemMsg').innerText = stats.system.toLocaleString();
-    document.getElementById('memberCount').innerText = Object.keys(members).length.toLocaleString();
+    document.getElementById('memberCount').innerText = Object.keys(members).length;
     document.getElementById('netStats').innerText = stats.netActivity.toLocaleString();
 
     const tableBody = document.getElementById('membersBody');
     tableBody.innerHTML = '';
 
-    // الترتيب حسب التفاعل الصافي
+    // الترتيب حسب "التفاعل الصافي" (من الأكثر تفاعلاً للأقل)
     const sorted = Object.entries(members).sort((a, b) => (b[1].total - b[1].deleted) - (a[1].total - a[1].deleted));
 
     sorted.forEach(([name, data]) => {
         const userNet = data.total - data.deleted;
         const row = `
             <tr>
-                <td style="color:#fff; font-weight:bold;">${name}</td>
+                <td style="color:var(--primary-glow, #58a6ff); font-weight:bold;">${name}</td>
                 <td>${data.text}</td>
                 <td>${data.media}</td>
                 <td style="color:#ff4444;">${data.deleted}</td>
-                <td><span class="net-score">${userNet}</span></td>
+                <td style="color:#3fb950; font-weight:bold;">${userNet}</td>
             </tr>`;
         tableBody.innerHTML += row;
     });
