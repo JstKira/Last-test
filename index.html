@@ -1,52 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محلل الرقابة - ممالك لاست</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🛰️ نظام رقابة ممالك لاست</h1>
-            <p>التحليل الدقيق لتفاعل الأعضاء (نسخة الرقابة العليا)</p>
-        </header>
-
-        <section class="upload-area">
-            <input type="file" id="fileInput" accept=".txt" hidden>
-            <button class="btn-main" onclick="document.getElementById('fileInput').click()">رفع ملف الشات (.txt)</button>
-        </section>
-
-        <div id="loading" style="display:none; color: #4fc3f7; margin-top: 20px;">
-             جاري فحص البيانات بدقة...
-        </div>
-
-        <section id="dashboard" class="dashboard" style="display:none;">
-            <div class="main-stats">
-                <div class="stat-card">إجمالي الرسائل (الخام): <span id="totalMsg">0</span></div>
-                <div class="stat-card">رسائل نصية فقط: <span id="textOnly">0</span></div>
-                <div class="stat-card">الوسائط (تقارير): <span id="totalMedia">0</span></div>
-                <div class="stat-card">رسائل محذوفة: <span id="totalDeleted">0</span></div>
-                <div class="stat-card" style="border-bottom-color: #3fb950;">التفاعل الصافي: <span id="netStats" style="color:#3fb950">0</span></div>
-                <div class="stat-card">رسائل النظام: <span id="systemMsg">0</span></div>
-                <div class="stat-card">عدد الأعضاء: <span id="memberCount">0</span></div>
-            </div>
-
-            <table class="members-table">
-                <thead>
-                    <tr>
-                        <th>اسم العضو</th>
-                        <th>رسائل نصية</th>
-                        <th>وسائط (تقارير)</th>
-                        <th>محذوف</th>
-                        <th>التفاعل الصافي</th>
-                    </tr>
-                </thead>
-                <tbody id="membersBody"></tbody>
-            </table>
-        </section>
-    </div>
-    <script src="index.js"></script>
-</body>
-</html>
